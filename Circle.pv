@@ -4,6 +4,6 @@ import math
 stroke(0)
 cx = 200
 cy = 200
-a = 0
-r = 100
+a = 0 #the degrees of the turn
+r = 100 #the length of the radius
 line (cx, cy,(cx + r * math.cos(a)), cy + r * math.sin(a))
