@@ -1,0 +1,51 @@
+import json
+#with open("songschildren_short.json") as infile:
+#    data = json.load(infile)
+size(3000,3000)
+
+with open("songschildren_short_master.json") as infile:
+    data = json.load(infile)
+# start position
+x = WIDTH / 2
+y = HEIGHT - 50
+
+def segment(x, y, x_direction, height, data):
+    x2 = x + x_direction
+    y2 = y - height
+    artist = data['artist']
+    song = data['song']
+ 
+    
+    stroke(1, 1, 0.0)
+    pen (3)
+    line (x, y, x2, y2)
+   
+    stroke(0.0 + (x / y), 0.8, 0.0 + (y / y2), 0.1)
+    #print  (0.0+ (x / y))
+    #print  (0.0 + (y / y2))
+    
+    font(10)
+    text (artist, x2, y2)
+    text (song, x2, y2+10)
+    if 'children' in data:
+        childs = data['children']
+        if len(childs) > 0:
+            spacing = height + 100
+            total = (len(childs) -1) * spacing
+            x1 = x2 -(total / 2)
+            new_h_l = height + 50
+            #new_h_r = height - 5 
+            #left = x_direction - 10 
+            #right = x_direction + 20 
+            i = 0.1
+            
+            for c in childs:
+                segment(x2, y2, x2 - (x1 + (i * spacing)), new_h_l, c)
+                i = i+1
+                spacing = (spacing - 10)
+            
+            
+            
+        return (x2, y2)
+    
+segment(x, y, 0, 100, data)

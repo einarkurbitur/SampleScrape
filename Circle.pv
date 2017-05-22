@@ -1,0 +1,9 @@
+size(400, 400)
+background(1)
+import math
+stroke(0)
+cx = 200
+cy = 200
+a = 0
+r = 100
+line (cx, cy,(cx + r * math.cos(a)), cy + r * math.sin(a))
