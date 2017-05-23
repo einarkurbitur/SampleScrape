@@ -5,7 +5,7 @@ import math
 # start position
 cx = WIDTH / 2
 cy = HEIGHT / 2
-r = 30
+r = 80
 
 # Making it recursive:
 # 1. add extra argument 'depth'
@@ -22,16 +22,14 @@ def segment(cx, cy, x_direction, height, depth,degrees):
     #line (x, y, x2, y2)
     line (cx, cy,(x2 + r * math.cos(a)), cy + r * math.sin(a))
     if depth > 0:
-        p = 0.4
-        stroke(p)
-        segment(x2 , y2, x_direction - (40), (10), depth - 1,80)
-        segment(x2 , y2, x_direction + (40), (10), depth - 1,-80)
+        segment(x2 , y2, x_direction - (40), (10), depth - 1,0)
+        segment(x2 , y2, x_direction + (40), (10), depth - 1,-180)
 
     return (x2, y2)
     
 
 
 # play with 3rd and 4th argument
-segment(400, 400, 0, 100, 1, 0)
+segment(400, 400, 0, 100, 1, -90)
 
 

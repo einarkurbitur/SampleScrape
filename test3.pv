@@ -1,0 +1,16 @@
+size(512, 512)
+background(1)
+
+def setup():
+    global frame
+    frame = 0
+    pass
+
+def draw():
+    global frame
+    transform(CORNER)
+    with transform():
+        translate(256,256)
+        rotate(frame)
+        text("Welcome to PlotDevice", 200, 0)
+    frame += 1
