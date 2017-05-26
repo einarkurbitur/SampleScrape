@@ -53,14 +53,15 @@ def segment(data, mina, maxa, prevWidth, depth):
         
     if 'children' in data:
         childs = data['children']
+        nChilds = data['nChilds']
         if len(childs) > 0:
-            space = (maxa - mina) / (len(childs) * 1.0)
+            space = (maxa - mina) / (nChilds * 1.0)
             newmin = mina
             for c in childs:
-                segment(c, newmin, newmin + space, wordWidth, depth + 1)
-                newmin += space
+                spacePerChild = space * c["nChilds"]
+                segment(c, newmin, newmin + spacePerChild, wordWidth, depth + 1)
+                newmin += spacePerChild
 
 
 enhancedData = prewalk(data, 0)
-print enhancedData
-segment(data, 0, 360, 200, 0)
+segment(enhancedData, 0, 360, 200, 0)
