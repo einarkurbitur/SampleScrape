@@ -1,6 +1,5 @@
 import json
-#with open("songschildren_short.json") as infile:
-#    data = json.load(infile)
+
 size(2000,2000)
 
 with open("songschildren_short_master.json") as infile:
@@ -11,18 +10,36 @@ y = HEIGHT - 50
 
 transform(CORNER)
 
+def prewalk(data, depth):
+    preparedData = {}
+    # Copy existing properties
+    props = ["artist", "song", "sample", "link", "year", "genre"]
+    for k in props:
+        preparedData[k] = data[k]
+    width = 1
+    children = []
+    if 'children' in data:
+        childs = data['children']
+        if len(childs) > 0:
+            childWidth = 0
+            for c in childs:
+                childData = prewalk(c, depth + 1)
+                children.append(childData)
+                childWidth += childData["nChilds"]
+            width = max(width, childWidth)
+    preparedData["nChilds"] = width
+    preparedData["children"] = children
+    return preparedData
+
+
+
 def segment(data, mina, maxa, prevWidth, depth):
-    print depth, mina, maxa
-    # x2 = x + x_direction
-    # y2 = y - height
+    # print depth, mina, maxa
+
     # artist = data['artist']
     song = data['song']
 
-    # stroke(0.5, 1, 0.0)
-    # pen (3)
-    # line (x, y, x2, y2)
     font(10)
-    # text (artist, x2, y2)
     with transform():
         translate(WIDTH /2 , HEIGHT/2)
         print "r: " + str(mina + (maxa - mina) / 2.0)
@@ -33,36 +50,17 @@ def segment(data, mina, maxa, prevWidth, depth):
         wordWidth = measure(song).width
         stroke(0.4)
         line ((distanceFromCenter - gen_width) + prevWidth, 0, distanceFromCenter, 0)
-
-    # stroke(0.0 + (x / y), 0.8, 0.0 + (y / y2), 0.1)
-    #print  (0.0+ (x / y))
-    #print  (0.0 + (y / y2))
-    
-    
+        
     if 'children' in data:
         childs = data['children']
         if len(childs) > 0:
-            #spacing = height + 100
-            #total = (len(childs) -1) * spacing
-            #x1 = x2 -(total / 2)
-            #new_h_l = height + 50
-            #new_h_r = height - 5 
-            #left = x_direction - 10 
-            #right = x_direction + 20 
-            # i = 0.1
             space = (maxa - mina) / (len(childs) * 1.0)
-            # print space
             newmin = mina
-            
             for c in childs:
                 segment(c, newmin, newmin + space, wordWidth, depth + 1)
-                # print newmin
                 newmin += space
-                # spacing = (spacing - 10)
-            
-            
-            
-        # return (x2, y2)
 
 
+enhancedData = prewalk(data, 0)
+print enhancedData
 segment(data, 0, 360, 200, 0)
