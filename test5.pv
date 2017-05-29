@@ -2,22 +2,26 @@ import json
 #with open("songschildren_short.json") as infile:
 #    data = json.load(infile)
 size(2000,2000)
+background(1)
 
 with open("songschildren_short_master.json") as infile:
     data = json.load(infile)
 # start position
 x = WIDTH / 2
 y = HEIGHT - 50
+color(mode=RGB, range=255)
 
 transform(CORNER)
 
 def segment(data, mina, maxa, prevWidth, depth):
-    print depth, mina, maxa
+    # print depth, mina, maxa
     # x2 = x + x_direction
     # y2 = y - height
     # artist = data['artist']
     song = data['song']
     artist = data['artist']
+    genre = data['genre']
+    year = data['year']
 
     # stroke(0.5, 1, 0.0)
     # pen (3)
@@ -26,19 +30,38 @@ def segment(data, mina, maxa, prevWidth, depth):
     # text (artist, x2, y2)
     with transform():
         translate(WIDTH /2 , HEIGHT/2)
-        print "r: " + str(mina + (maxa - mina) / 2.0)
+        # print "r: " + str(mina + (maxa - mina) / 2.0)
         rotate(mina + (maxa - mina) / 2.0)
         gen_width = 200
         distanceFromCenter = gen_width * depth
-        text (song, distanceFromCenter, 0)
+        if genre.startswith('Hi'):
+            fill(255,53,26)
+            stroke(255,53,26)
+        elif genre.startswith('O'):
+            fill(224, 255, 121)
+            stroke(224, 255, 121)
+        elif genre.startswith('El'):
+            fill(90, 136, 204)
+            stroke(90, 136, 204)
+        elif genre.startswith('Ro'):
+            fill(9, 78, 178)
+            stroke(9, 78, 178)
+        elif genre.startswith('Go'):
+            fill(178,95,84)
+            stroke(178,95,84)
+        elif genre.startswith('Re'):
+            fill(255,255,255)
+            stroke(255,255,255)
+        else:
+            fill(255,255,255)
+        text (song + " - " + artist, distanceFromCenter, 0)
         text (artist, distanceFromCenter, 5)
+        text (year, distanceFromCenter, 10)
         wordWidth = measure(song).width
-        stroke(0.4)
+        #stroke(255,255,255)
         line ((distanceFromCenter - gen_width) + prevWidth, 0, distanceFromCenter, 0)
 
-    # stroke(0.0 + (x / y), 0.8, 0.0 + (y / y2), 0.1)
-    #print  (0.0+ (x / y))
-    #print  (0.0 + (y / y2))
+  
     
     
     if 'children' in data:
