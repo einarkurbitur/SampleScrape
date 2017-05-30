@@ -44,18 +44,13 @@ transform(CORNER)
 
 def segment(data, mina, maxa, prevWidth, depth):
     # print depth, mina, maxa
-    # x2 = x + x_direction
-    # y2 = y - height
-    # artist = data['artist']
     song = data['song']
     artist = data['artist']
     genre = data['genre']
     year = data['year']
-    # stroke(0.5, 1, 0.0)
-    # pen (3)
-    # line (x, y, x2, y2)
+    
     font(5)
-    # text (artist, x2, y2)
+    
     with transform():
         translate(WIDTH /2 , HEIGHT/2)
         # print "r: " + str(mina + (maxa - mina) / 2.0)
@@ -88,6 +83,8 @@ def segment(data, mina, maxa, prevWidth, depth):
         text (artist, distanceFromCenter,textheight(artist)/4)
         text (year, distanceFromCenter,(textheight(year)/4) +5)
         wordWidth = measure(artist).width
+        if wordWidth < measure(song).width:
+            wordWidth = measure(song).width
         line ((distanceFromCenter - gen_width) + prevWidth, 0, distanceFromCenter, 0)
 
   
@@ -96,27 +93,18 @@ def segment(data, mina, maxa, prevWidth, depth):
     if 'children' in data:
         childs = data['children']
         if len(childs) > 0:
-            #spacing = height + 100
-            #total = (len(childs) -1) * spacing
-            #x1 = x2 -(total / 2)
-            #new_h_l = height + 50
-            #new_h_r = height - 5 
-            #left = x_direction - 10 
-            #right = x_direction + 20 
-            # i = 0.1
+            
             space = (maxa - mina) / (len(childs) * 1.0)
-            # print space
+
             newmin = mina
             
             for c in childs:
                 segment(c, newmin, newmin + space, wordWidth, depth + 1)
-                # print newmin
+
                 newmin += space
-                # spacing = (spacing - 10)
+
             
             
-            
-        # return (x2, y2)
 
 
 segment(data, 0, 360, 200, 0)
