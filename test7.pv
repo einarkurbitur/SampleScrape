@@ -1,4 +1,5 @@
 import json
+import math
 #with open("songschildren_short.json") as infile:
 #    data = json.load(infile)
 size(2000,2000)
@@ -42,8 +43,30 @@ text('Other', 10, 240)
 
 transform(CORNER)
 
-def segment(data, mina, maxa, prevWidth, depth):
-    # print depth, mina, maxa
+def prewalk(data, depth):
+    preparedData = {}
+    # Copy existing properties
+    props = ["artist", "song", "sample", "link", "year", "genre"]
+    for k in props:
+        preparedData[k] = data[k]
+    width = 1
+    children = []
+    if 'children' in data:
+        childs = data['children']
+        if len(childs) > 0:
+            childWidth = 0
+            for c in childs:
+                childData = prewalk(c, depth + 1)
+                children.append(childData)
+                childWidth += childData["nChilds"]
+            width = max(width, childWidth)
+    preparedData["nChilds"] = width
+    preparedData["children"] = children
+    print children
+    return preparedData
+    
+
+def segment(data, mina, maxa, fromx, fromy, prevWidth, depth):
     song = data['song']
     artist = data['artist']
     genre = data['genre']
@@ -54,7 +77,9 @@ def segment(data, mina, maxa, prevWidth, depth):
     with transform():
         translate(WIDTH /2 , HEIGHT/2)
         # print "r: " + str(mina + (maxa - mina) / 2.0)
-        rotate(mina + (maxa - mina) / 2.0)
+        a = (mina + (maxa - mina) / 2.0)
+        rad= math.pi * (a+90) / 180
+        rotate(a)
         gen_width = 200
         distanceFromCenter = gen_width * depth
        
@@ -82,29 +107,30 @@ def segment(data, mina, maxa, prevWidth, depth):
         text (song, distanceFromCenter,(textheight(song)/4) -5)
         text (artist, distanceFromCenter,textheight(artist)/4)
         text (year, distanceFromCenter,(textheight(year)/4) +5)
-        wordWidth = measure(artist).width
-        if wordWidth < measure(song).width:
-            wordWidth = measure(song).width
-        line ((distanceFromCenter - gen_width) + prevWidth, 0, distanceFromCenter, 0)
-
+        wordWidth = max(measure(artist).width,measure(song).width)
+        # line ((distanceFromCenter - gen_width) + prevWidth, 0, distanceFromCenter, 0)
+    tox = (WIDTH/2 + distanceFromCenter * math.sin(rad))
+    toy = (HEIGHT/2 + distanceFromCenter * math.cos(rad))
+    line(fromx, fromy, tox, toy)
+    newx = (WIDTH/2 + (distanceFromCenter+wordWidth) * math.sin(rad))
+    newy = (HEIGHT/2 + (distanceFromCenter+wordWidth )* math.cos(rad))
   
     
     
     if 'children' in data:
         childs = data['children']
+        nChilds = data['nChilds']
         if len(childs) > 0:
-            
-            space = (maxa - mina) / (len(childs) * 1.0)
-
+            space = (maxa - mina) / (nChilds * 1.0)
             newmin = mina
+            if not depth > 10:
+                for c in childs:
+                    spacePerChild = space * c["nChilds"]
+                    segment(c, newmin, newmin + spacePerChild, newx, newy, wordWidth, depth + 1)
+                    newmin += spacePerChild
+
             
-            for c in childs:
-                segment(c, newmin, newmin + space, wordWidth, depth + 1)
-
-                newmin += space
-
-            
             
 
-
-segment(data, 0, 360, 200, 0)
+enhancedData = prewalk(data, 0)
+segment(enhancedData, -180, 180, WIDTH/2, HEIGHT/2, 200, 0)

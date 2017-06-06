@@ -1,0 +1,139 @@
+import json
+import math
+#with open("songschildren_short.json") as infile:
+#    data = json.load(infile)
+size(3508,4961)
+background(0)
+
+with open("songschildren_short_master.json") as infile:
+    data = json.load(infile)
+# start position
+x = WIDTH / 2
+y = HEIGHT - 50
+color(mode=hex, range=255)
+font('Roboto Slab')
+font(40)
+HH = "c0392b"
+ED = "#f1c40f"
+RP = "7f8c8d"
+GO = "8e44ad"
+RE = "2ecc71"
+OT = "2980b9"
+BASE = "ecf0f1"
+
+fill(HH)
+text("Hip-Hop / Rap / R&B", 10, 40)
+
+fill(ED)
+text('Electronic / Dance', 10, 80)
+
+fill(RP)
+text('Rock / Pop',10,120)
+
+fill(GO)
+text('Gospel', 10, 160)
+
+fill(RE)
+text('Reggae', 10, 200)
+
+fill(OT)
+text('Other', 10, 240)
+
+
+
+
+transform(CORNER)
+
+def prewalk(data, depth):
+    preparedData = {}
+    # Copy existing properties
+    props = ["artist", "song", "sample", "link", "year", "genre"]
+    for k in props:
+        preparedData[k] = data[k]
+    width = 1
+    children = []
+    if 'children' in data:
+        childs = data['children']
+        if len(childs) > 0:
+            childWidth = 0
+            for c in childs:
+                childData = prewalk(c, depth + 1)
+                children.append(childData)
+                childWidth += childData["nChilds"]
+            width = max(width, childWidth)
+    preparedData["nChilds"] = width
+    preparedData["children"] = children
+    # print children
+    return preparedData
+    
+
+def segment(data, mina, maxa, fromx, fromy, prevWidth, depth):
+    song = data['song']
+    artist = data['artist']
+    genre = data['genre']
+    year = data['year']
+    
+    font(5)
+    
+    with transform():
+        translate(WIDTH /2 , HEIGHT/2)
+        # print "r: " + str(mina + (maxa - mina) / 2.0)
+        a = (mina + (maxa - mina) / 2.0)
+        rad= math.pi * (a+90) / 180
+        rotate(a)
+        gen_width = 300
+        distanceFromCenter = gen_width * depth
+       
+        if genre.startswith('Hi'):
+            fill(HH)
+            stroke(HH)
+        elif genre.startswith('El'):
+            fill(ED)
+            stroke(ED)
+        elif genre.startswith('Ro'):
+            fill(RP)
+            stroke(RP)
+        elif genre.startswith('Go'):
+            fill(GO)
+            stroke(GO)
+        elif genre.startswith('Re'):
+            fill(RE)
+            stroke(RE)
+        elif genre.startswith('O'):
+            fill(OT)
+            stroke(OT)
+        else:
+            fill(BASE)
+       
+        text (song, distanceFromCenter,(textheight(song)/4) -5)
+        text (artist, distanceFromCenter,textheight(artist)/4)
+        text (year, distanceFromCenter,(textheight(year)/4) +5)
+        wordWidth = max(measure(artist).width,measure(song).width)
+        # line ((distanceFromCenter - gen_width) + prevWidth, 0, distanceFromCenter, 0)
+    tox = (WIDTH/2 + distanceFromCenter * math.sin(rad))
+    toy = (HEIGHT/2 + distanceFromCenter * math.cos(rad))
+    line(fromx, fromy, tox, toy)
+    newx = (WIDTH/2 + (distanceFromCenter+wordWidth) * math.sin(rad))
+    newy = (HEIGHT/2 + (distanceFromCenter+wordWidth )* math.cos(rad))
+  
+    
+    
+    if 'children' in data:
+        childs = data['children']
+        nChilds = data['nChilds']
+        if len(childs) > 0:
+            space = (maxa - mina) / (nChilds * 1.0)
+            newmin = mina
+            if not depth > 10:
+                for c in childs:
+                    spacePerChild = space * c["nChilds"]
+                    segment(c, newmin, newmin + spacePerChild, newx, newy, wordWidth, depth + 1)
+                    newmin += spacePerChild
+
+
+enhancedData = prewalk(data, 0)
+segment(enhancedData, -180, 180, WIDTH/2, HEIGHT/2, 200, 0)
+fill(BASE)            
+font(5)
+text('1973', WIDTH/2, HEIGHT/2+textheight('James')/4 + 5)
+text('James Brown', WIDTH/2, HEIGHT/2+textheight('James')/4)
